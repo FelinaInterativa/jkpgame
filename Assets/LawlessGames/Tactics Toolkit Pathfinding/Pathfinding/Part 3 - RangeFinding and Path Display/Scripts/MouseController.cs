@@ -7,6 +7,14 @@ namespace finished3
 {
     public class MouseController : MonoBehaviour
     {
+        private Weapon _weapon;
+        [SerializeField] private Vector3 _weaponSignPos;
+        private GameObject _weaponSign;
+
+        [SerializeField] private GameObject _rockPrefab;
+        [SerializeField] private GameObject _paperPrefab;
+        [SerializeField] private GameObject _scissorsPrefab;
+
         public GameObject cursor;
         public float speed;
         public GameObject characterPrefab;
@@ -19,9 +27,14 @@ namespace finished3
         private List<OverlayTile> path;
         private List<OverlayTile> rangeFinderTiles;
         private bool isMoving;
+        private Vector2Int _lastMove;
 
         private void Start()
         {
+            _weapon = (Weapon)Random.Range( 0, 3 );
+            _weaponSignPos = characterPrefab.transform.GetChild( 0 ).localPosition;
+            MapManager.Instance.SetHelperPattern( _weapon );
+
             pathFinder = new PathFinder();
             rangeFinder = new RangeFinder();
             arrowTranslator = new ArrowTranslator();
@@ -62,6 +75,13 @@ namespace finished3
 
                 if (Input.GetMouseButtonDown(0))
                 {
+
+                    if(tile.Previous != null)
+                    {
+                        _lastMove = tile.grid2DLocation - tile.Previous.grid2DLocation;
+                    }
+
+
                     tile.ShowTile();
 
                     if (character == null)
@@ -69,6 +89,7 @@ namespace finished3
                         character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
                         PositionCharacterOnLine(tile);
                         GetInRangeTiles();
+                        SetSign();
                     }
                     else
                     {
@@ -102,8 +123,32 @@ namespace finished3
             {
                 GetInRangeTiles();
                 isMoving = false;
+                
+                _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite );
+                SetSign();
+
             }
 
+        }
+
+        private void SetSign()
+        {
+            if(_weaponSign)
+                Destroy( _weaponSign );
+
+            switch(_weapon)
+            {
+                case Weapon.ROCK:
+                    _weaponSign = Instantiate( _rockPrefab, character.transform );
+                    break;
+                case Weapon.PAPER:
+                    _weaponSign = Instantiate( _paperPrefab, character.transform );
+                    break;
+                case Weapon.SCISSORS:
+                    _weaponSign = Instantiate( _scissorsPrefab, character.transform );
+                    break;
+            }
+            _weaponSign.transform.localPosition = _weaponSignPos;
         }
 
         private void PositionCharacterOnLine(OverlayTile tile)
