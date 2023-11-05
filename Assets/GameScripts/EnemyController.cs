@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class EnemyController : CharacterInfo
 {
@@ -34,14 +35,18 @@ public class EnemyController : CharacterInfo
         //isMoving = false;
         _rangeFinderTiles = new List<OverlayTile>();
 
-        var randomTile = MapManager.Instance.GetRandomTile();
+        var randomTile = MapManager.Instance.GetRandomEdgeTile();
 
         while(randomTile.isOccupied)
         {
-            randomTile = MapManager.Instance.GetRandomTile();
+            randomTile = MapManager.Instance.GetRandomEdgeTile();
         }
 
         PositionCharacterOnTile( randomTile );
+
+
+       
+
 
         GetInRangeTiles();
     }
