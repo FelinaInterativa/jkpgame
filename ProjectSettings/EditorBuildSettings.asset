@@ -4,5 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: e13d227ed06606743b50f24f561ba64d
+  - enabled: 1
+    path: Assets/LawlessGames/Tactics Toolkit Pathfinding/Pathfinding/Part 3 - RangeFinding
+      and Path Display/Scenes/Part 3 - RangeFinding and PathDisplay.unity
+    guid: f0e18f9538db6a845ac82ef56c372224
   m_configObjects: {}
