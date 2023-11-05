@@ -34,8 +34,16 @@ public class EnemyController : CharacterInfo
         //isMoving = false;
         _rangeFinderTiles = new List<OverlayTile>();
 
-        OverlayTile randomTile = MapManager.Instance.GetRandomTile();
+        var randomTile = MapManager.Instance.GetRandomTile();
+
+        while(randomTile.isOccupied)
+        {
+            randomTile = MapManager.Instance.GetRandomTile();
+        }
+
         PositionCharacterOnTile( randomTile );
+
+        GetInRangeTiles();
     }
 
     void LateUpdate()
@@ -92,6 +100,10 @@ public class EnemyController : CharacterInfo
         if(Vector2.Distance( transform.position, _path[ 0 ].transform.position ) < 0.00001f)
         {
             PositionCharacterOnTile( _path[ 0 ] );
+
+            _path[ 0 ].isOccupied = true;
+            _path[ 0 ].Previous.isOccupied = false;
+
             _path.RemoveAt( 0 );
             
             

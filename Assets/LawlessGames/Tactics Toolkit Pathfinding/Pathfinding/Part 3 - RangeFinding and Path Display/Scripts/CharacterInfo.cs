@@ -102,11 +102,15 @@ public class CharacterInfo : MonoBehaviour
         _rangeFinder = new RangeFinder();
         _rangeFinderTiles = new List<OverlayTile>();
         _path = new List<OverlayTile>();
-        //_path.Capacity = _movementRange;
     }
 
     protected void PositionCharacterOnTile( OverlayTile tile )
     {
+        tile.isOccupied = true;
+
+        if(tile.Previous != null)
+            tile.Previous.isOccupied = false;
+
         StandingOnTile = tile;
         transform.position = new Vector3( tile.transform.position.x, tile.transform.position.y + 0.0001f, tile.transform.position.z );
         //GetComponent<SpriteRenderer>().sortingOrder = tile.GetComponent<SpriteRenderer>().sortingOrder;

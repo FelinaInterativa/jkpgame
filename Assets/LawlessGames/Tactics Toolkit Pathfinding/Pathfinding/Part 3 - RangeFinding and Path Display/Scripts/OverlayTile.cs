@@ -8,6 +8,7 @@ public class OverlayTile : MonoBehaviour
     public int F { get { return G + H; } }
 
     public bool isBlocked = false;
+    public bool isOccupied = false;
 
     public OverlayTile Previous;
     public Vector3Int gridLocation;

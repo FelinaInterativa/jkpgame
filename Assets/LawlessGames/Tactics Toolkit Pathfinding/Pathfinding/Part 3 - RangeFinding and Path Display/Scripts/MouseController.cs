@@ -103,6 +103,8 @@ public class MouseController : CharacterInfo
         if(Vector2.Distance( transform.position, _path[ 0 ].transform.position ) < 0.00001f)
         {
             PositionCharacterOnTile( _path[ 0 ] );
+            _path[ 0 ].isOccupied = true;
+            _path[ 0 ].Previous.isOccupied = false;
             _path.RemoveAt( 0 );
         }
 
