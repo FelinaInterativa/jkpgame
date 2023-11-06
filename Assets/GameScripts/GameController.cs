@@ -24,8 +24,17 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private float _counter;
 
-    [SerializeField] private ParticleSystem _dieFX;
-    [SerializeField] private ParticleSystem _dmgFX;
+    [SerializeField] private AudioClip _combatMusic;
+    private AudioSource _audioSource;
+
+    [SerializeField] private GameObject _dieFXObj;
+    [SerializeField] private GameObject _dmgFXObj;
+
+    private Animator _dieFX;
+    private Animator _dmgFX;
+    private string _dieFXAnimationTriggerName = "dieFXTrigger";
+    
+    private string _dmgFXAnimationTriggerName = "dmgFXTrigger";
 
     public delegate void OnWaveStarted();
     public event Action WaveStarted;
@@ -41,10 +50,14 @@ public class GameController : MonoBehaviour
         _playerController.SetActive( false );
         CharacterInfo.CharacterActed += OnCharacterAction;
         MapManager.Instance.OnMapBuilded += Init;
+        _dieFX = _dieFXObj.GetComponent<Animator>();
+        _dmgFX = _dmgFXObj.GetComponent<Animator>();
+        _audioSource = Camera.main.GetComponent<AudioSource>();
     }
 
     private void Start()
     {
+        _skipTurnButton.interactable = false;
         _lifeBar.fillAmount = 1;
     }
 
@@ -146,7 +159,8 @@ public class GameController : MonoBehaviour
     private void ResolveDyingCharacter( CharacterInfo character )
     {
         _dieFX.transform.position = character.transform.position;
-        _dieFX.Play();
+        StartCoroutine( PlayAnimation( _dieFX ) );
+        _dieFX.ResetTrigger( _dieFXAnimationTriggerName );
 
         if(character.Type == CharacterType.Enemy)
         {
@@ -157,6 +171,9 @@ public class GameController : MonoBehaviour
 
     IEnumerator ResolveCombat( CharacterInfo enemy )
     {
+        _audioSource.clip = _combatMusic;
+        _audioSource.Play();
+
         Debug.Log($"player; {_player.Weapon} enemy: {enemy.Weapon}");
 
         if(_player.Weapon == enemy.Weapon)
@@ -185,7 +202,8 @@ public class GameController : MonoBehaviour
             Debug.Log( $"player took {enemy.Damage} of damage and has {_player.LifeLeft} left" );
         }
 
-        _dmgFX.Play();
+
+        StartCoroutine( PlayAnimation( _dmgFX ) );
         _player.GetComponent<MouseController>().enabled = true;
         _skipTurnButton.interactable = true;
     }
@@ -199,5 +217,14 @@ public class GameController : MonoBehaviour
             Character = _player,
             Type = _player.Type
         } );
+    }
+
+    private IEnumerator PlayAnimation( Animator animator )
+    {
+        animator.SetTrigger( "playAnimation" );
+
+        yield return new WaitForSeconds(animator.playbackTime);
+
+        animator.transform.position = Vector3.up * 1000;
     }
 }

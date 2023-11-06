@@ -86,39 +86,6 @@ public class EnemyController : CharacterInfo
 
     private void MoveAlongPath()
     {
-        if(_path.Count == 1)
-        {
-            Status = Status.Awaiting;
-            _nextMove = null;
-
-            _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite );
-            SetSign();
-
-            GetInRangeTiles();
-
-            foreach(var item in _rangeFinderTiles)
-            {
-                if(item.CharacterOnIt != null)
-                {
-                    Debug.Log(item.CharacterOnIt.name);
-                }
-
-
-                if(item.CharacterOnIt != null && item.CharacterOnIt.Type == CharacterType.Player)
-                {
-                    OnCharacterActed( new CharacterMove()
-                    {
-                        Action = CharacterAction.Attack,
-                        Character = this,
-                        Type = _type
-                    } );
-                }
-            }
-
-            return;
-        }
-
-
         var step = _speed * Time.deltaTime;
 
         float zIndex = _path[ 0 ].transform.position.z;
@@ -139,13 +106,33 @@ public class EnemyController : CharacterInfo
 
             if(_stepsCounter == 0)
             {
-                GetInRangeTiles();
                 Status = Status.Awaiting;
                 _nextMove = null;
 
                 _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite, true );
 
                 SetSign();
+
+                GetInRangeTiles();
+
+                foreach(var item in _rangeFinderTiles)
+                {
+                    if(item.CharacterOnIt != null)
+                    {
+                        Debug.Log( item.CharacterOnIt.name );
+                    }
+
+
+                    if(item.CharacterOnIt != null && item.CharacterOnIt.Type == CharacterType.Player)
+                    {
+                        OnCharacterActed( new CharacterMove()
+                        {
+                            Action = CharacterAction.Attack,
+                            Character = this,
+                            Type = _type
+                        } );
+                    }
+                }
             }
         }
     }
