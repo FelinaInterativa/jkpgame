@@ -17,7 +17,8 @@ public enum CharacterAction
 {
     Spawn,
     Move,
-    Attack
+    Attack,
+    Die
 }
 
 public class CharacterMove
@@ -38,6 +39,7 @@ public class CharacterInfo : MonoBehaviour
     
     [SerializeField]
     protected CharacterType _type;
+    public CharacterType Type => _type;
     
     [SerializeField]
     protected Status Status;
@@ -47,12 +49,14 @@ public class CharacterInfo : MonoBehaviour
     protected bool _isSpawned;
 
     protected Weapon _weapon;
+    public Weapon Weapon => _weapon;
 
     [SerializeField]
     private int _lifeLeft = 100;
 
     [SerializeField]
     private int _damage = 100;
+    public int Damage => _damage;
 
     [SerializeField]
     protected float _speed;
@@ -146,6 +150,20 @@ public class CharacterInfo : MonoBehaviour
         foreach(var item in _rangeFinderTiles)
         {
             item.ShowTile();
+        }
+    }
+
+    public void TakeDamage(int dmg )
+    {
+        _lifeLeft -= dmg;
+
+        if( _lifeLeft <= 0)
+        {
+            OnCharacterActed( new CharacterMove() {
+                Action = CharacterAction.Die,
+                Character = this,
+                Type = _type
+            } );
         }
     }
 

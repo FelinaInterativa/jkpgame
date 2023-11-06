@@ -6,9 +6,9 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     [SerializeField] private List<CharacterInfo> _enemies = new List<CharacterInfo>();
-    
+
     private CharacterInfo _player;
-    
+
     [SerializeField] private GameObject _playerController;
 
     [SerializeField] private GameObject _enemyPrefab;
@@ -16,6 +16,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private float _timeBetweenEnemiesActions = 0.5f;
 
     [SerializeField] private int _numEnemies;
+
+    [SerializeField] private ParticleSystem _dieFX;
+    [SerializeField] private ParticleSystem _dmgFX;
 
     private void Awake()
     {
@@ -54,7 +57,7 @@ public class GameController : MonoBehaviour
 
     IEnumerator MoveEnemiesTorwardPlayer()
     {
-        yield return new WaitForSeconds( _timeBetweenEnemiesActions  * 3);
+        yield return new WaitForSeconds( _timeBetweenEnemiesActions * 3 );
 
         for(int i = 0; i < _enemies.Count; i++)
         {
@@ -84,13 +87,67 @@ public class GameController : MonoBehaviour
                         break;
                     case CharacterAction.Attack:
                         break;
+                    case CharacterAction.Die:
+                        ResolveDyingCharacter( action.Character );
+                        break;
                 }
 
                 break;
             case CharacterType.Enemy:
-                break;
-            default:
+
+                switch(action.Action)
+                {
+                    case CharacterAction.Spawn:
+                        break;
+                    case CharacterAction.Move:
+                        break;
+                    case CharacterAction.Attack:
+                        ResolveCombat( action.Character );
+                        break;
+                    case CharacterAction.Die:
+                        ResolveDyingCharacter( action.Character );
+                        break;
+                }
+
                 break;
         }
+    }
+
+    private void ResolveDyingCharacter( CharacterInfo character )
+    {
+        _dieFX.transform.position = character.transform.position;
+        _dieFX.Play();
+
+        if(character.Type == CharacterType.Enemy)
+        {
+            _enemies.Remove( character );
+        }
+    }
+
+    private void ResolveCombat( CharacterInfo enemy )
+    {
+        if(_player.Weapon == enemy.Weapon)
+        {
+            //Draw
+            return;
+        }
+
+        else if(_player.Weapon == Weapon.ROCK && enemy.Weapon == Weapon.SCISSORS ||
+                _player.Weapon == Weapon.PAPER && enemy.Weapon == Weapon.ROCK ||
+                _player.Weapon == Weapon.SCISSORS && enemy.Weapon == Weapon.PAPER)
+        {
+            _dmgFX.transform.position = enemy.transform.position;
+            enemy.TakeDamage( _player.Damage );
+        }
+
+        else if(_player.Weapon == Weapon.ROCK && enemy.Weapon == Weapon.PAPER ||
+                _player.Weapon == Weapon.PAPER && enemy.Weapon == Weapon.SCISSORS ||
+                _player.Weapon == Weapon.SCISSORS && enemy.Weapon == Weapon.ROCK)
+        {
+            _dmgFX.transform.position = _player.transform.position;
+            _player.TakeDamage( enemy.Damage );
+        }
+
+        _dmgFX.Play();
     }
 }

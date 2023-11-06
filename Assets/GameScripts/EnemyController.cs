@@ -11,7 +11,7 @@ public class EnemyController : CharacterInfo
     private ArrowTranslator _arrowTranslator;
 
     [SerializeField] private OverlayTile _nextMove;
-    
+
     private Vector2Int _lastMove;
 
     [SerializeField] private int _stepsCounter;
@@ -45,7 +45,7 @@ public class EnemyController : CharacterInfo
         PositionCharacterOnTile( randomTile );
 
 
-       
+
 
 
         GetInRangeTiles();
@@ -77,10 +77,29 @@ public class EnemyController : CharacterInfo
 
     public void MoveTo( OverlayTile tile )
     {
-        _nextMove = tile;
-        _stepsCounter = _movementRange;
+        var path = _pathFinder.FindPath( StandingOnTile, _nextMove, _rangeFinderTiles );
+
+        if(path.Count > 1)
+        {
+            OnCharacterActed( new CharacterMove()
+            {
+                Action = CharacterAction.Attack,
+                Character = this,
+                Type = _type
+            } ) ;
+        }
+        else
+        {
+            _nextMove = tile;
+            _stepsCounter = _movementRange;
+        }
+
     }
 
+    //private bool CanAttack()
+    //{
+    //    _path = _pathFinder.FindPath( StandingOnTile, _nextMove, _rangeFinderTiles );
+    //}
 
     private void MoveAlongPath()
     {
@@ -110,8 +129,8 @@ public class EnemyController : CharacterInfo
             _path[ 0 ].Previous.isOccupied = false;
 
             _path.RemoveAt( 0 );
-            
-            
+
+
             _stepsCounter--;
 
             if(_stepsCounter == 0)
