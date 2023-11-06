@@ -69,13 +69,13 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
-        //_counter += Time.deltaTime;
-        //if(_counter > _timeBetweenWaves)
-        //{
-        //    _enemiesQuantity += _enemiesAddedPerWave;
-        //    StartCoroutine( DropEnemies() );
-        //    _counter = 0;
-        //}
+        _counter += Time.deltaTime;
+        if(_counter > _timeBetweenWaves)
+        {
+            _enemiesQuantity += _enemiesAddedPerWave;
+            StartCoroutine( DropEnemies() );
+            _counter = 0;
+        }
     }
 
 
@@ -174,12 +174,8 @@ public class GameController : MonoBehaviour
         _audioSource.clip = _combatMusic;
         _audioSource.Play();
 
-        Debug.Log($"player; {_player.Weapon} enemy: {enemy.Weapon}");
-
         if(_player.Weapon == enemy.Weapon)
         {
-            //Draw
-            Debug.Log($"DRAW");
             yield break;
         }
         else if(_player.Weapon == Weapon.ROCK && enemy.Weapon == Weapon.SCISSORS ||
@@ -199,7 +195,6 @@ public class GameController : MonoBehaviour
             _dmgFX.transform.position = _player.transform.position;
             _player.TakeDamage( enemy.Damage );
             _lifeBar.fillAmount = (float)_player.LifeLeft / _player.InitialLifeAmount;
-            Debug.Log( $"player took {enemy.Damage} of damage and has {_player.LifeLeft} left" );
         }
 
 
