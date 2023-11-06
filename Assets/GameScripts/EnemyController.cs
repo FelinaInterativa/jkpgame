@@ -117,12 +117,6 @@ public class EnemyController : CharacterInfo
 
                 foreach(var item in _rangeFinderTiles)
                 {
-                    if(item.CharacterOnIt != null)
-                    {
-                        Debug.Log( item.CharacterOnIt.name );
-                    }
-
-
                     if(item.CharacterOnIt != null && item.CharacterOnIt.Type == CharacterType.Player)
                     {
                         OnCharacterActed( new CharacterMove()
