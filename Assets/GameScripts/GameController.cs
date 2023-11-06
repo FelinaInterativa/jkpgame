@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
@@ -63,7 +64,6 @@ public class GameController : MonoBehaviour
 
     private void Init()
     {
-        Debug.Log( "Initializing..." );
         _playerController.SetActive( true );
     }
 
@@ -162,11 +162,21 @@ public class GameController : MonoBehaviour
         StartCoroutine( PlayAnimation( _dieFX ) );
         _dieFX.ResetTrigger( _dieFXAnimationTriggerName );
 
-        if(character.Type == CharacterType.Enemy)
+        switch(character.Type)
         {
+            case CharacterType.Player:
+                Invoke( nameof(ResetGame), 1 );
+                break;
+            case CharacterType.Enemy:
             _enemies.Remove( character );
             Destroy( character.gameObject );
+                break;
         }
+    }
+
+    private void ResetGame()
+    {
+        SceneManager.LoadScene( SceneManager.GetActiveScene().name );
     }
 
     IEnumerator ResolveCombat( CharacterInfo enemy )
