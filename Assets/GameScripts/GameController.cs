@@ -223,7 +223,7 @@ public class GameController : MonoBehaviour
     {
         animator.SetTrigger( "playAnimation" );
 
-        yield return new WaitForSeconds(animator.playbackTime);
+        yield return new WaitForSeconds( 0.4f );
 
         animator.transform.position = Vector3.up * 1000;
     }
