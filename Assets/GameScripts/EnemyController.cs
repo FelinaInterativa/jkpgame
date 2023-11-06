@@ -38,7 +38,7 @@ public class EnemyController : CharacterInfo
 
         var randomTile = MapManager.Instance.GetRandomEdgeTile();
 
-        while(randomTile.isOccupied)
+        while(randomTile.CharacterOnIt != null)
         {
             randomTile = MapManager.Instance.GetRandomEdgeTile();
         }
@@ -79,23 +79,8 @@ public class EnemyController : CharacterInfo
 
     public void MoveTo( OverlayTile tile )
     {
-        var path = _pathFinder.FindPath( StandingOnTile, tile, _rangeFinderTiles );
-
-        if(path.Count <= 1)
-        {
-            OnCharacterActed( new CharacterMove()
-            {
-                Action = CharacterAction.Attack,
-                Character = this,
-                Type = _type
-            } );
-        }
-        else
-        {
-            _nextMove = tile;
-            _stepsCounter = _movementRange;
-        }
-
+        _nextMove = tile;
+        _stepsCounter = _movementRange;
     }
 
 
@@ -103,12 +88,33 @@ public class EnemyController : CharacterInfo
     {
         if(_path.Count == 1)
         {
-            GetInRangeTiles();
             Status = Status.Awaiting;
             _nextMove = null;
 
             _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite );
             SetSign();
+
+            GetInRangeTiles();
+
+            foreach(var item in _rangeFinderTiles)
+            {
+                if(item.CharacterOnIt != null)
+                {
+                    Debug.Log(item.CharacterOnIt.name);
+                }
+
+
+                if(item.CharacterOnIt != null && item.CharacterOnIt.Type == CharacterType.Player)
+                {
+                    OnCharacterActed( new CharacterMove()
+                    {
+                        Action = CharacterAction.Attack,
+                        Character = this,
+                        Type = _type
+                    } );
+                }
+            }
+
             return;
         }
 
@@ -123,8 +129,8 @@ public class EnemyController : CharacterInfo
         {
             PositionCharacterOnTile( _path[ 0 ] );
 
-            _path[ 0 ].isOccupied = true;
-            _path[ 0 ].Previous.isOccupied = false;
+            _path[ 0 ].CharacterOnIt = this;
+            _path[ 0 ].Previous.CharacterOnIt = null;
 
             _path.RemoveAt( 0 );
 
@@ -138,7 +144,7 @@ public class EnemyController : CharacterInfo
                 _nextMove = null;
 
                 _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite, true );
-                
+
                 SetSign();
             }
         }

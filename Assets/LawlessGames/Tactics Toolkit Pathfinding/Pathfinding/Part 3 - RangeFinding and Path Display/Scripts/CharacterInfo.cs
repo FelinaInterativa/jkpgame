@@ -54,6 +54,10 @@ public class CharacterInfo : MonoBehaviour
 
     [SerializeField]
     private int _lifeLeft = 100;
+    public int LifeLeft => _lifeLeft;
+
+    private int _initialLifeAmount;
+    public int InitialLifeAmount => _initialLifeAmount;
 
     [SerializeField]
     private int _damage = 100;
@@ -107,14 +111,15 @@ public class CharacterInfo : MonoBehaviour
         _rangeFinder = new RangeFinder();
         _rangeFinderTiles = new List<OverlayTile>();
         _path = new List<OverlayTile>();
+        _initialLifeAmount = _lifeLeft;
     }
 
     protected void PositionCharacterOnTile( OverlayTile tile )
     {
-        tile.isOccupied = true;
+        tile.CharacterOnIt = this;
 
         if(tile.Previous != null)
-            tile.Previous.isOccupied = false;
+            tile.Previous.CharacterOnIt = null;
 
         StandingOnTile = tile;
         transform.position = new Vector3( tile.transform.position.x, tile.transform.position.y + 0.0001f, tile.transform.position.z );

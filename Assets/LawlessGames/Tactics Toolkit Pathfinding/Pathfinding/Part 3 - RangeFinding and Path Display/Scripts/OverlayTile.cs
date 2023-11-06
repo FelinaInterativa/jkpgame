@@ -8,7 +8,12 @@ public class OverlayTile : MonoBehaviour
     public int F { get { return G + H; } }
 
     public bool isBlocked = false;
-    public bool isOccupied = false;
+    //public bool isOccupied = false;
+    private CharacterInfo _characterOnIt;
+    public CharacterInfo CharacterOnIt {
+        get => _characterOnIt;
+        set => _characterOnIt = value;
+    }
 
     public OverlayTile Previous;
     public Vector3Int gridLocation;

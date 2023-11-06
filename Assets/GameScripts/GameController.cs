@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -28,6 +30,9 @@ public class GameController : MonoBehaviour
     public delegate void OnWaveStarted();
     public event Action WaveStarted;
 
+    [SerializeField] private Image _lifeBar;
+    [SerializeField] private TMP_Text _lifeText;
+
     private void Awake()
     {
         _player = _playerController.GetComponent<CharacterInfo>();
@@ -36,10 +41,9 @@ public class GameController : MonoBehaviour
         MapManager.Instance.OnMapBuilded += Init;
     }
 
-
-
     private void Start()
     {
+        _lifeBar.fillAmount = 1;
     }
 
     private void Init()
@@ -154,6 +158,7 @@ public class GameController : MonoBehaviour
         if(_player.Weapon == enemy.Weapon)
         {
             //Draw
+            Debug.Log($"DRAW");
             yield break;
         }
         else if(_player.Weapon == Weapon.ROCK && enemy.Weapon == Weapon.SCISSORS ||
@@ -172,9 +177,12 @@ public class GameController : MonoBehaviour
             yield return new WaitForSeconds( _timeBetweenEnemiesActions * 2);
             _dmgFX.transform.position = _player.transform.position;
             _player.TakeDamage( enemy.Damage );
+            _lifeBar.fillAmount = (float)_player.LifeLeft / _player.InitialLifeAmount;
+            Debug.Log( $"player took {enemy.Damage} of damage and has {_player.LifeLeft} left" );
         }
 
         _dmgFX.Play();
+        _player.GetComponent<MouseController>().enabled = true;
     }
 
 

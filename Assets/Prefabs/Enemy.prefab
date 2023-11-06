@@ -128,8 +128,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 1
   Status: 0
+  _weapon: 0
   _lifeLeft: 100
-  _damage: 100
+  _damage: 1
   _speed: 1
   _movementRange: 1
   _path: []
@@ -137,5 +138,6 @@ MonoBehaviour:
   _rockPrefab: {fileID: 5614180953807574471, guid: 562007550d425b84a8e67ef9810f3f48, type: 3}
   _paperPrefab: {fileID: 1884016208243096596, guid: 8e07aa4aba42dfd49923d3fb0e8034ae, type: 3}
   _scissorsPrefab: {fileID: 6173822302547748677, guid: ffc302ab24c9ee940b1686c5a77ca34a, type: 3}
-  _weaponSignPos: {x: 0, y: 0, z: 0}
   _nextMove: {fileID: 0}
+  _stepsCounter: 0
+  _visibilityRange: 0
