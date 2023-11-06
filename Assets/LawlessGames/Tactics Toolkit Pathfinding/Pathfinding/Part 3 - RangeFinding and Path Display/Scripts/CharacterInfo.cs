@@ -48,6 +48,7 @@ public class CharacterInfo : MonoBehaviour
 
     protected bool _isSpawned;
 
+    [SerializeField]
     protected Weapon _weapon;
     public Weapon Weapon => _weapon;
 

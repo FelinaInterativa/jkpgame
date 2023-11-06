@@ -15,13 +15,18 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private float _timeBetweenEnemiesActions = 0.5f;
 
-    [SerializeField] private int _startinEnemies;
+    [SerializeField] private int _enemiesQuantity;
     [SerializeField] private int _enemiesAddedPerWave;
     [SerializeField] private float _timeBetweenWaves;
+
+    [SerializeField]
     private float _counter;
 
     [SerializeField] private ParticleSystem _dieFX;
     [SerializeField] private ParticleSystem _dmgFX;
+
+    public delegate void OnWaveStarted();
+    public event Action WaveStarted;
 
     private void Awake()
     {
@@ -45,20 +50,24 @@ public class GameController : MonoBehaviour
 
     private void Update()
     {
-        _counter += Time.deltaTime;
-        if(_counter > _timeBetweenWaves)
-        {
-
-        }
+        //_counter += Time.deltaTime;
+        //if(_counter > _timeBetweenWaves)
+        //{
+        //    _enemiesQuantity += _enemiesAddedPerWave;
+        //    StartCoroutine( DropEnemies() );
+        //    _counter = 0;
+        //}
     }
 
 
     //Drop enemies after player chooses his/her position
     IEnumerator DropEnemies()
     {
-        yield return new WaitForSeconds( _timeBetweenEnemiesActions * 3 );
+        WaveStarted?.Invoke();
 
-        for(int i = 0; i < _startinEnemies; i++)
+        yield return new WaitForSeconds( _timeBetweenEnemiesActions );
+
+        for(int i = 0; i < _enemiesQuantity; i++)
         {
             var enemy = Instantiate( _enemyPrefab ).GetComponent<EnemyController>();
             yield return new WaitForSeconds( _timeBetweenEnemiesActions );
@@ -115,7 +124,7 @@ public class GameController : MonoBehaviour
                     case CharacterAction.Move:
                         break;
                     case CharacterAction.Attack:
-                        ResolveCombat( action.Character );
+                        StartCoroutine(ResolveCombat( action.Character ));
                         break;
                     case CharacterAction.Die:
                         ResolveDyingCharacter( action.Character );
@@ -138,18 +147,20 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void ResolveCombat( CharacterInfo enemy )
+    IEnumerator ResolveCombat( CharacterInfo enemy )
     {
+        Debug.Log($"player; {_player.Weapon} enemy: {enemy.Weapon}");
+
         if(_player.Weapon == enemy.Weapon)
         {
             //Draw
-            return;
+            yield break;
         }
-
         else if(_player.Weapon == Weapon.ROCK && enemy.Weapon == Weapon.SCISSORS ||
                 _player.Weapon == Weapon.PAPER && enemy.Weapon == Weapon.ROCK ||
                 _player.Weapon == Weapon.SCISSORS && enemy.Weapon == Weapon.PAPER)
         {
+            yield return new WaitForSeconds( _timeBetweenEnemiesActions * 2 );
             _dmgFX.transform.position = enemy.transform.position;
             enemy.TakeDamage( _player.Damage );
         }
@@ -158,6 +169,7 @@ public class GameController : MonoBehaviour
                 _player.Weapon == Weapon.PAPER && enemy.Weapon == Weapon.SCISSORS ||
                 _player.Weapon == Weapon.SCISSORS && enemy.Weapon == Weapon.ROCK)
         {
+            yield return new WaitForSeconds( _timeBetweenEnemiesActions * 2);
             _dmgFX.transform.position = _player.transform.position;
             _player.TakeDamage( enemy.Damage );
         }

@@ -236,7 +236,7 @@ public class MapManager : MonoBehaviour
         _right.sprite = rightSprite;
     }
 
-    public Weapon ProcessMovement( Weapon weapon, Vector2Int deltaMovement, out Sprite sprite )
+    public Weapon ProcessMovement( Weapon weapon, Vector2Int deltaMovement, out Sprite sprite, bool skipHelpPatternReset = false )
     {
         Weapon weaponEnum = Weapon.ROCK;
         if(deltaMovement.y != 0)
@@ -253,7 +253,9 @@ public class MapManager : MonoBehaviour
         }
 
         _sprites.TryGetValue( weaponEnum.ToString().ToLower(), out sprite );
-        SetHelperPattern( weaponEnum );
+        
+        if(!skipHelpPatternReset)
+            SetHelperPattern( weaponEnum );
 
         return weaponEnum;
     }

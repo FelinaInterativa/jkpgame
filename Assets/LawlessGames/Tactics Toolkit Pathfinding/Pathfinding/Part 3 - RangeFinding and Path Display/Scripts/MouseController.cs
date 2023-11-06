@@ -24,9 +24,7 @@ public class MouseController : CharacterInfo
 
         arrowTranslator = new ArrowTranslator();
 
-        
-        _isMoving = false;
-        
+        _isMoving = false;        
     }
 
     void LateUpdate()

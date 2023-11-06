@@ -5647,9 +5647,10 @@ MonoBehaviour:
   _playerController: {fileID: 6688883964391914038}
   _enemyPrefab: {fileID: 3004763204490164056, guid: 15248d60ee51de5498cf618f80994ce2, type: 3}
   _timeBetweenEnemiesActions: 0.5
-  _startinEnemies: 1
-  _enemiesAddedPerWave: 2
-  _timeBetweenWaves: 50
+  _enemiesQuantity: 1
+  _enemiesAddedPerWave: 1
+  _timeBetweenWaves: 20
+  _counter: 0
   _dieFX: {fileID: 179974149}
   _dmgFX: {fileID: 1716358717}
 --- !u!4 &1294905940

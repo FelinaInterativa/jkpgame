@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.WSA;
 
 public class EnemyController : CharacterInfo
 {
@@ -71,6 +72,7 @@ public class EnemyController : CharacterInfo
 
         if(_path.Count > 0 && Status == Status.Moving)
         {
+            _lastMove = _nextMove.grid2DLocation - _nextMove.Previous.grid2DLocation;
             MoveAlongPath();
         }
     }
@@ -79,7 +81,6 @@ public class EnemyController : CharacterInfo
     {
         var path = _pathFinder.FindPath( StandingOnTile, tile, _rangeFinderTiles );
 
-        Debug.Log( "asdçlfkj: " + path.Count );
         if(path.Count <= 1)
         {
             OnCharacterActed( new CharacterMove()
@@ -87,7 +88,7 @@ public class EnemyController : CharacterInfo
                 Action = CharacterAction.Attack,
                 Character = this,
                 Type = _type
-            } ) ;
+            } );
         }
         else
         {
@@ -97,10 +98,6 @@ public class EnemyController : CharacterInfo
 
     }
 
-    //private bool CanAttack()
-    //{
-    //    _path = _pathFinder.FindPath( StandingOnTile, _nextMove, _rangeFinderTiles );
-    //}
 
     private void MoveAlongPath()
     {
@@ -140,7 +137,8 @@ public class EnemyController : CharacterInfo
                 Status = Status.Awaiting;
                 _nextMove = null;
 
-                _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite );
+                _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite, true );
+                
                 SetSign();
             }
         }
