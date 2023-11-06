@@ -15,7 +15,10 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private float _timeBetweenEnemiesActions = 0.5f;
 
-    [SerializeField] private int _numEnemies;
+    [SerializeField] private int _startinEnemies;
+    [SerializeField] private int _enemiesAddedPerWave;
+    [SerializeField] private float _timeBetweenWaves;
+    private float _counter;
 
     [SerializeField] private ParticleSystem _dieFX;
     [SerializeField] private ParticleSystem _dmgFX;
@@ -40,12 +43,22 @@ public class GameController : MonoBehaviour
         _playerController.SetActive( true );
     }
 
+    private void Update()
+    {
+        _counter += Time.deltaTime;
+        if(_counter > _timeBetweenWaves)
+        {
+
+        }
+    }
+
+
     //Drop enemies after player chooses his/her position
     IEnumerator DropEnemies()
     {
         yield return new WaitForSeconds( _timeBetweenEnemiesActions * 3 );
 
-        for(int i = 0; i < _numEnemies; i++)
+        for(int i = 0; i < _startinEnemies; i++)
         {
             var enemy = Instantiate( _enemyPrefab ).GetComponent<EnemyController>();
             yield return new WaitForSeconds( _timeBetweenEnemiesActions );
@@ -121,6 +134,7 @@ public class GameController : MonoBehaviour
         if(character.Type == CharacterType.Enemy)
         {
             _enemies.Remove( character );
+            Destroy( character.gameObject );
         }
     }
 

@@ -77,9 +77,10 @@ public class EnemyController : CharacterInfo
 
     public void MoveTo( OverlayTile tile )
     {
-        var path = _pathFinder.FindPath( StandingOnTile, _nextMove, _rangeFinderTiles );
+        var path = _pathFinder.FindPath( StandingOnTile, tile, _rangeFinderTiles );
 
-        if(path.Count > 1)
+        Debug.Log( "asdçlfkj: " + path.Count );
+        if(path.Count <= 1)
         {
             OnCharacterActed( new CharacterMove()
             {
