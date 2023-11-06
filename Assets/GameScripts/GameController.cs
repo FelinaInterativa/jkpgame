@@ -33,6 +33,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private Image _lifeBar;
     [SerializeField] private TMP_Text _lifeText;
 
+    [SerializeField] private Button _skipTurnButton;
+
     private void Awake()
     {
         _player = _playerController.GetComponent<CharacterInfo>();
@@ -92,6 +94,7 @@ public class GameController : MonoBehaviour
         }
 
         _player.GetComponent<MouseController>().enabled = true;
+        _skipTurnButton.interactable = true;
     }
 
     private void OnCharacterAction( CharacterMove action )
@@ -108,6 +111,7 @@ public class GameController : MonoBehaviour
                         StartCoroutine( DropEnemies() );
                         break;
                     case CharacterAction.Move:
+                        _skipTurnButton.interactable = false;
                         _player.GetComponent<MouseController>().enabled = false;
                         StartCoroutine( MoveEnemiesTorwardPlayer() );
                         break;
@@ -183,6 +187,7 @@ public class GameController : MonoBehaviour
 
         _dmgFX.Play();
         _player.GetComponent<MouseController>().enabled = true;
+        _skipTurnButton.interactable = true;
     }
 
 

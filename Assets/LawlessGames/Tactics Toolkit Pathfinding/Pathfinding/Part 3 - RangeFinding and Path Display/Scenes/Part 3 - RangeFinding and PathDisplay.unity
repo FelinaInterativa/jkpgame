@@ -5723,6 +5723,7 @@ MonoBehaviour:
   _dmgFX: {fileID: 1716358717}
   _lifeBar: {fileID: 1813490332}
   _lifeText: {fileID: 703536041}
+  _skipTurnButton: {fileID: 610716301}
 --- !u!4 &1294905940
 Transform:
   m_ObjectHideFlags: 0
