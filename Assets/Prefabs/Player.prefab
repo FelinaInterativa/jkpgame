@@ -98,11 +98,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _type: 0
   Status: 0
+  _weapon: 0
   _lifeLeft: 100
   _damage: 100
-  _speed: 3
+  _speed: 2
   _movementRange: 2
-  _visibilityRange: 0
   _path: []
   _rangeFinderTiles: []
   _rockPrefab: {fileID: 5614180953807574471, guid: 562007550d425b84a8e67ef9810f3f48, type: 3}

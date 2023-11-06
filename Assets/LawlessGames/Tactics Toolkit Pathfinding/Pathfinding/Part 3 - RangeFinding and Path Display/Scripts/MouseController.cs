@@ -24,9 +24,7 @@ public class MouseController : CharacterInfo
 
         arrowTranslator = new ArrowTranslator();
 
-        
-        _isMoving = false;
-        
+        _isMoving = false;        
     }
 
     void LateUpdate()
@@ -39,7 +37,7 @@ public class MouseController : CharacterInfo
 
             OverlayTile tile = hit.Value.collider.gameObject.GetComponent<OverlayTile>();
             cursor.transform.position = tile.transform.position;
-            cursor.gameObject.GetComponent<SpriteRenderer>().sortingOrder = tile.transform.GetComponent<SpriteRenderer>().sortingOrder;
+            cursor.gameObject.GetComponent<SpriteRenderer>().sortingOrder = tile.transform.GetComponent<SpriteRenderer>().sortingOrder +1;
 
             if(_rangeFinderTiles.Contains( tile ) && !_isMoving)
             {
@@ -103,6 +101,8 @@ public class MouseController : CharacterInfo
         if(Vector2.Distance( transform.position, _path[ 0 ].transform.position ) < 0.00001f)
         {
             PositionCharacterOnTile( _path[ 0 ] );
+            _path[ 0 ].CharacterOnIt = this;
+            _path[ 0 ].Previous.CharacterOnIt = null;
             _path.RemoveAt( 0 );
         }
 
@@ -141,8 +141,6 @@ public class MouseController : CharacterInfo
         }
         _weaponSign.transform.localPosition = _weaponSignPos;
     }
-
-    
 
     private static RaycastHit2D? GetFocusedOnTile()
     {
