@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using UnityEngine.WSA;
 
 public class EnemyController : CharacterInfo
 {
@@ -10,7 +12,7 @@ public class EnemyController : CharacterInfo
     private ArrowTranslator _arrowTranslator;
 
     [SerializeField] private OverlayTile _nextMove;
-    
+
     private Vector2Int _lastMove;
 
     [SerializeField] private int _stepsCounter;
@@ -34,8 +36,20 @@ public class EnemyController : CharacterInfo
         //isMoving = false;
         _rangeFinderTiles = new List<OverlayTile>();
 
-        OverlayTile randomTile = MapManager.Instance.GetRandomTile();
+        var randomTile = MapManager.Instance.GetRandomEdgeTile();
+
+        while(randomTile.CharacterOnIt != null)
+        {
+            randomTile = MapManager.Instance.GetRandomEdgeTile();
+        }
+
         PositionCharacterOnTile( randomTile );
+
+
+
+
+
+        GetInRangeTiles();
     }
 
     void LateUpdate()
@@ -58,6 +72,7 @@ public class EnemyController : CharacterInfo
 
         if(_path.Count > 0 && Status == Status.Moving)
         {
+            _lastMove = _nextMove.grid2DLocation - _nextMove.Previous.grid2DLocation;
             MoveAlongPath();
         }
     }
@@ -71,18 +86,6 @@ public class EnemyController : CharacterInfo
 
     private void MoveAlongPath()
     {
-        if(_path.Count == 1)
-        {
-            GetInRangeTiles();
-            Status = Status.Awaiting;
-            _nextMove = null;
-
-            _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite );
-            SetSign();
-            return;
-        }
-
-
         var step = _speed * Time.deltaTime;
 
         float zIndex = _path[ 0 ].transform.position.z;
@@ -92,19 +95,44 @@ public class EnemyController : CharacterInfo
         if(Vector2.Distance( transform.position, _path[ 0 ].transform.position ) < 0.00001f)
         {
             PositionCharacterOnTile( _path[ 0 ] );
+
+            _path[ 0 ].CharacterOnIt = this;
+            _path[ 0 ].Previous.CharacterOnIt = null;
+
             _path.RemoveAt( 0 );
-            
-            
+
+
             _stepsCounter--;
 
             if(_stepsCounter == 0)
             {
-                GetInRangeTiles();
                 Status = Status.Awaiting;
                 _nextMove = null;
 
-                _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite );
+                _weapon = MapManager.Instance.ProcessMovement( _weapon, _lastMove, out Sprite sprite, true );
+
                 SetSign();
+
+                GetInRangeTiles();
+
+                foreach(var item in _rangeFinderTiles)
+                {
+                    if(item.CharacterOnIt != null)
+                    {
+                        Debug.Log( item.CharacterOnIt.name );
+                    }
+
+
+                    if(item.CharacterOnIt != null && item.CharacterOnIt.Type == CharacterType.Player)
+                    {
+                        OnCharacterActed( new CharacterMove()
+                        {
+                            Action = CharacterAction.Attack,
+                            Character = this,
+                            Type = _type
+                        } );
+                    }
+                }
             }
         }
     }

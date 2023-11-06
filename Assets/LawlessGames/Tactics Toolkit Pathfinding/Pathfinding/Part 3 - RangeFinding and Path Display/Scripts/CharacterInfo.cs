@@ -17,7 +17,8 @@ public enum CharacterAction
 {
     Spawn,
     Move,
-    Attack
+    Attack,
+    Die
 }
 
 public class CharacterMove
@@ -38,6 +39,7 @@ public class CharacterInfo : MonoBehaviour
     
     [SerializeField]
     protected CharacterType _type;
+    public CharacterType Type => _type;
     
     [SerializeField]
     protected Status Status;
@@ -46,13 +48,20 @@ public class CharacterInfo : MonoBehaviour
 
     protected bool _isSpawned;
 
+    [SerializeField]
     protected Weapon _weapon;
+    public Weapon Weapon => _weapon;
 
     [SerializeField]
     private int _lifeLeft = 100;
+    public int LifeLeft => _lifeLeft;
+
+    private int _initialLifeAmount;
+    public int InitialLifeAmount => _initialLifeAmount;
 
     [SerializeField]
     private int _damage = 100;
+    public int Damage => _damage;
 
     [SerializeField]
     protected float _speed;
@@ -80,7 +89,7 @@ public class CharacterInfo : MonoBehaviour
 
     public static event CharacterActionEvent CharacterActed;
 
-    protected void OnCharacterActed( CharacterMove action )
+    public void OnCharacterActed( CharacterMove action )
     {
         CharacterActed?.Invoke( action );
     }
@@ -102,11 +111,16 @@ public class CharacterInfo : MonoBehaviour
         _rangeFinder = new RangeFinder();
         _rangeFinderTiles = new List<OverlayTile>();
         _path = new List<OverlayTile>();
-        //_path.Capacity = _movementRange;
+        _initialLifeAmount = _lifeLeft;
     }
 
     protected void PositionCharacterOnTile( OverlayTile tile )
     {
+        tile.CharacterOnIt = this;
+
+        if(tile.Previous != null)
+            tile.Previous.CharacterOnIt = null;
+
         StandingOnTile = tile;
         transform.position = new Vector3( tile.transform.position.x, tile.transform.position.y + 0.0001f, tile.transform.position.z );
         //GetComponent<SpriteRenderer>().sortingOrder = tile.GetComponent<SpriteRenderer>().sortingOrder;
@@ -142,6 +156,20 @@ public class CharacterInfo : MonoBehaviour
         foreach(var item in _rangeFinderTiles)
         {
             item.ShowTile();
+        }
+    }
+
+    public void TakeDamage(int dmg )
+    {
+        _lifeLeft -= dmg;
+
+        if( _lifeLeft <= 0)
+        {
+            OnCharacterActed( new CharacterMove() {
+                Action = CharacterAction.Die,
+                Character = this,
+                Type = _type
+            } );
         }
     }
 

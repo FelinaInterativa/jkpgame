@@ -15,6 +15,12 @@ public class MapManager : MonoBehaviour
     private Dictionary<Vector2Int, OverlayTile> _map;
     public Dictionary<Vector2Int, OverlayTile> Map => _map;
 
+    private Dictionary<Vector2Int, OverlayTile> _edgeMap = new Dictionary<Vector2Int, OverlayTile>();
+    public Dictionary<Vector2Int, OverlayTile> EdgeMap => _edgeMap;
+
+
+    private IOrderedEnumerable<Tilemap> _tilemaps;
+    public IOrderedEnumerable<Tilemap> Tilemaps => _tilemaps;
 
     [SerializeField]
     private Sprite[] _weaponsSprites;
@@ -41,8 +47,8 @@ public class MapManager : MonoBehaviour
     private event Action _onMapBuilded;
     public event Action OnMapBuilded
     {
-        add { _onMapBuilded += value;}
-        remove { _onMapBuilded -= value;}
+        add { _onMapBuilded += value; }
+        remove { _onMapBuilded -= value; }
     }
 
     private void Awake()
@@ -65,10 +71,10 @@ public class MapManager : MonoBehaviour
 
     private void SetTiles()
     {
-        var tileMaps = gameObject.transform.GetComponentsInChildren<Tilemap>().OrderByDescending( x => x.GetComponent<TilemapRenderer>().sortingOrder );
+        _tilemaps = gameObject.transform.GetComponentsInChildren<Tilemap>().OrderByDescending( x => x.GetComponent<TilemapRenderer>().sortingOrder );
         _map = new Dictionary<Vector2Int, OverlayTile>();
 
-        foreach(var tm in tileMaps)
+        foreach(var tm in _tilemaps)
         {
             BoundsInt bounds = tm.cellBounds;
 
@@ -89,6 +95,11 @@ public class MapManager : MonoBehaviour
                                 overlayTile.gameObject.GetComponent<OverlayTile>().gridLocation = new Vector3Int( x, y, z );
 
                                 _map.Add( new Vector2Int( x, y ), overlayTile.gameObject.GetComponent<OverlayTile>() );
+                                var tilebase = tm.GetTile( new Vector3Int( x, y, z ) );
+                                if(IsEdgeTile( new Vector2Int( x, y ) ))
+                                {
+                                    _edgeMap.Add( new Vector2Int( x, y ), overlayTile.gameObject.GetComponent<OverlayTile>() );
+                                }
                             }
                         }
                     }
@@ -97,6 +108,43 @@ public class MapManager : MonoBehaviour
         }
 
         _onMapBuilded?.Invoke();
+    }
+
+    private bool IsEdgeTile( Vector2Int originTile )
+    {
+
+        var surroundingTiles = new List<OverlayTile>();
+
+
+        Vector2Int TileToCheck = new Vector2Int( originTile.x + 1, originTile.y );
+        if(_map.ContainsKey( TileToCheck ))
+        {
+            if(Mathf.Abs( _map[ TileToCheck ].transform.position.z - _map[ originTile ].transform.position.z ) <= 1)
+                surroundingTiles.Add( _map[ TileToCheck ] );
+        }
+
+        TileToCheck = new Vector2Int( originTile.x - 1, originTile.y );
+        if(_map.ContainsKey( TileToCheck ))
+        {
+            if(Mathf.Abs( _map[ TileToCheck ].transform.position.z - _map[ originTile ].transform.position.z ) <= 1)
+                surroundingTiles.Add( _map[ TileToCheck ] );
+        }
+
+        TileToCheck = new Vector2Int( originTile.x, originTile.y + 1 );
+        if(_map.ContainsKey( TileToCheck ))
+        {
+            if(Mathf.Abs( _map[ TileToCheck ].transform.position.z - _map[ originTile ].transform.position.z ) <= 1)
+                surroundingTiles.Add( _map[ TileToCheck ] );
+        }
+
+        TileToCheck = new Vector2Int( originTile.x, originTile.y - 1 );
+        if(_map.ContainsKey( TileToCheck ))
+        {
+            if(Mathf.Abs( _map[ TileToCheck ].transform.position.z - _map[ originTile ].transform.position.z ) <= 1)
+                surroundingTiles.Add( _map[ TileToCheck ] );
+        }
+
+        return surroundingTiles.Count < 4;
     }
 
     public List<OverlayTile> GetSurroundingTiles( Vector2Int originTile )
@@ -188,7 +236,7 @@ public class MapManager : MonoBehaviour
         _right.sprite = rightSprite;
     }
 
-    public Weapon ProcessMovement( Weapon weapon, Vector2Int deltaMovement, out Sprite sprite )
+    public Weapon ProcessMovement( Weapon weapon, Vector2Int deltaMovement, out Sprite sprite, bool skipHelpPatternReset = false )
     {
         Weapon weaponEnum = Weapon.ROCK;
         if(deltaMovement.y != 0)
@@ -205,7 +253,9 @@ public class MapManager : MonoBehaviour
         }
 
         _sprites.TryGetValue( weaponEnum.ToString().ToLower(), out sprite );
-        SetHelperPattern( weaponEnum );
+        
+        if(!skipHelpPatternReset)
+            SetHelperPattern( weaponEnum );
 
         return weaponEnum;
     }
@@ -213,5 +263,10 @@ public class MapManager : MonoBehaviour
     public OverlayTile GetRandomTile()
     {
         return Map.ElementAt( UnityEngine.Random.Range( 0, Map.Count - 1 ) ).Value;
+    }
+
+    public OverlayTile GetRandomEdgeTile()
+    {
+        return EdgeMap.ElementAt( UnityEngine.Random.Range( 0, EdgeMap.Count - 1 ) ).Value;
     }
 }
