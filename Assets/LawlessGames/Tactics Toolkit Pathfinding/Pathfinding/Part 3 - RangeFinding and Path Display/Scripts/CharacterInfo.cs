@@ -85,7 +85,7 @@ public class CharacterInfo : MonoBehaviour
 
     public static event CharacterActionEvent CharacterActed;
 
-    protected void OnCharacterActed( CharacterMove action )
+    public void OnCharacterActed( CharacterMove action )
     {
         CharacterActed?.Invoke( action );
     }

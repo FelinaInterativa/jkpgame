@@ -176,4 +176,15 @@ public class GameController : MonoBehaviour
 
         _dmgFX.Play();
     }
+
+
+    public void SkipTurn()
+    {
+        _player.OnCharacterActed( new CharacterMove()
+        {
+            Action = CharacterAction.Move,
+            Character = _player,
+            Type = _player.Type
+        } );
+    }
 }

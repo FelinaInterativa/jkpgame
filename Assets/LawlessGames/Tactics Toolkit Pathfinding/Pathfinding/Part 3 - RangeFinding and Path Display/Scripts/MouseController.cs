@@ -142,8 +142,6 @@ public class MouseController : CharacterInfo
         _weaponSign.transform.localPosition = _weaponSignPos;
     }
 
-    
-
     private static RaycastHit2D? GetFocusedOnTile()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint( Input.mousePosition );
